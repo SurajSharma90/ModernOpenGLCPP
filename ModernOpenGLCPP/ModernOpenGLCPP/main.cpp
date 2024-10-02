@@ -10,6 +10,23 @@
 
 const GLint WIDTH = 800, HEIGHT = 600;
 
+/*
+* 1. Init GLFW (Check for error)
+* 2. Set window properties, gl version, profile, forward compat.
+* 3. Create GLFW window (Check for error)
+* 4. Get buffer size from window
+* 5. Set opengl context to glfw window for glew
+* 6. Set GLEW experimental option
+* 7. Init GLEW (Check for errors)
+* 8. Set GL Viewport to buffersize
+* 9. Main loop (while window is not closed)
+* 9a. Poll for events (glfw)
+* 9b. Update game
+* 9c. Clear window color buffer
+* 9d. Swap window buffers
+* 10. Cleanup
+*/
+
 int main()
 {
   //Initialise GLFW
