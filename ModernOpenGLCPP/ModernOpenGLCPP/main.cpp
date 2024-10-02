@@ -1,5 +1,10 @@
 #include<iostream>
 
+#include<imgui.h>
+#include<imgui_impl_glfw.h>
+#include<imgui_impl_opengl3.h>
+//Do not include loader.h
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -52,6 +57,14 @@ int main()
   //Setup viewport (size of the part we are drawing to in the window)
   glViewport(0, 0, bufferWidth, bufferHeight);
 
+  //Init IMGUI
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  ImGuiIO& io = ImGui::GetIO(); (void)io;
+  ImGui::StyleColorsDark();
+  ImGui_ImplGlfw_InitForOpenGL(window, true);
+  ImGui_ImplOpenGL3_Init("#version 330");
+
   //Game loop
   while (!glfwWindowShouldClose(window))
   {
@@ -62,10 +75,29 @@ int main()
     glClearColor(1.f, 0.f, 0.f, 255.f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    //Imgui
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    //Create Imgui box
+    ImGui::Begin("My Name is window");
+    ImGui::Text("Hello!");
+    ImGui::End();
+
+    //Draw imgui
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    //End gl draw
     glfwSwapBuffers(window);
   }
 
   //End of program cleanup
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplGlfw_Shutdown();
+  ImGui::DestroyContext();
+
   glfwDestroyWindow(window);
   glfwTerminate();
 
