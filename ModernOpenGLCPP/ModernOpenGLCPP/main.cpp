@@ -82,6 +82,8 @@ int main()
   ImGui_ImplGlfw_InitForOpenGL(window, true);
   ImGui_ImplOpenGL3_Init("#version 330");
 
+  float bg_color[] {1.f, 0.f, 0.f};
+  
   //Game loop
   while (!glfwWindowShouldClose(window))
   {
@@ -89,7 +91,7 @@ int main()
     glfwPollEvents();
 
     //Clear buffer (color between 0-1 not 255)
-    glClearColor(1.f, 0.f, 0.f, 255.f);
+    glClearColor(bg_color[0], bg_color[1], bg_color[2], 255.f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     //Imgui
@@ -100,6 +102,7 @@ int main()
     //Create Imgui box
     ImGui::Begin("My Name is window");
     ImGui::Text("Hello!");
+    ImGui::ColorPicker3("Colors", bg_color);
     ImGui::End();
 
     //Draw imgui
