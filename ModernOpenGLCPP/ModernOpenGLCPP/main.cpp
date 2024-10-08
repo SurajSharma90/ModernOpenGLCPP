@@ -29,6 +29,34 @@ const GLint WIDTH = 800, HEIGHT = 600;
 
 int main()
 {
+  //Variables
+  float color[] = {1.f, 0.f, 1.f};
+  float vertices[] = {
+    -0.5f, -0.5f, 0.0f,
+    0.5f, -0.5f, 0.0f,
+    0.0f, 0.5f, 0.0f
+  };
+  GLuint triVbo;
+  GLuint triVao;
+
+  //Shader source
+  GLuint vertShader;
+  GLuint fragShader;
+  GLuint shaderProgram;
+  const char* vertShaderSrc = "#version 330 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "void main()\n"
+    "{\n"
+    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "}\0";
+  const char* fragShaderSrc = "#version 330 core\n"
+    "out vec4 FragColor;\n"
+    "uniform vec3 vColor;\n"
+    "void main()\n"
+    "{\n"
+    "    FragColor = vec4(vColor, 1.0f);\n"
+    "}\0";
+
   //Initialise GLFW
   if (!glfwInit())
   {
@@ -84,6 +112,65 @@ int main()
 
   float bg_color[] {1.f, 0.f, 0.f};
   
+  //Init triangle
+  glGenVertexArrays(1, &triVao);
+  glGenBuffers(1, &triVbo);
+  glBindVertexArray(triVao);
+
+  glBindBuffer(GL_ARRAY_BUFFER, triVbo);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  glEnableVertexAttribArray(0);
+
+  //Unbind
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
+
+  //Init shaders
+  vertShader = glCreateShader(GL_VERTEX_SHADER);
+  glShaderSource(vertShader, 1, &vertShaderSrc, NULL);
+  glCompileShader(vertShader);
+
+  fragShader = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(fragShader, 1, &fragShaderSrc, NULL);
+  glCompileShader(fragShader);
+
+  //Compile status shaders
+  int  success;
+  char infoLog[512];
+  glGetShaderiv(vertShader, GL_COMPILE_STATUS, &success);
+  if (!success)
+  {
+    glGetShaderInfoLog(vertShader, 512, NULL, infoLog);
+    std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+  }
+
+  glGetShaderiv(fragShader, GL_COMPILE_STATUS, &success);
+  if (!success)
+  {
+    glGetShaderInfoLog(fragShader, 512, NULL, infoLog);
+    std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+  }
+
+  //Shader program
+  shaderProgram = glCreateProgram();
+  glAttachShader(shaderProgram, vertShader);
+  glAttachShader(shaderProgram, fragShader);
+  glLinkProgram(shaderProgram);
+
+  //Error check program
+  glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+  if (!success)
+  {
+    glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+    std::cout << "ERROR::SHADER::PROGRAM::LINK_FAILED\n" << infoLog << std::endl;
+  }
+
+  //Cleanup shader
+  glDeleteShader(vertShader);
+  glDeleteShader(fragShader);
+
   //Game loop
   while (!glfwWindowShouldClose(window))
   {
@@ -94,6 +181,13 @@ int main()
     glClearColor(bg_color[0], bg_color[1], bg_color[2], 255.f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    //Render stuff
+    glUseProgram(shaderProgram);
+
+    glUniform3f(glGetUniformLocation(shaderProgram, "vColor"), color[0], color[1], color[2]);
+    glBindVertexArray(triVao);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
     //Imgui
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -103,6 +197,7 @@ int main()
     ImGui::Begin("My Name is window");
     ImGui::Text("Hello!");
     ImGui::ColorPicker3("Colors", bg_color);
+    ImGui::ColorPicker3("TriColor", color);
     ImGui::End();
 
     //Draw imgui
@@ -113,7 +208,6 @@ int main()
     glfwSwapBuffers(window);
   }
 
-  //End of program cleanup
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
