@@ -1,11 +1,9 @@
 #include<iostream>
 
-#include<imgui.h>
-#include<imgui_impl_glfw.h>
-#include<imgui_impl_opengl3.h>
 //Do not include loader.h
 
 #include "Shader.h"
+#include "ImGuiWrapper.h"
 
 const GLint WIDTH = 800, HEIGHT = 600;
 
@@ -37,6 +35,7 @@ int main()
   };
   GLuint triVbo;
   GLuint triVao;
+  float bg_color[]{ 1.f, 0.f, 0.f };
 
   //Initialise GLFW
   if (!glfwInit())
@@ -83,15 +82,7 @@ int main()
   //Setup viewport (size of the part we are drawing to in the window)
   glViewport(0, 0, bufferWidth, bufferHeight);
 
-  //Init IMGUI
-  IMGUI_CHECKVERSION();
-  ImGui::CreateContext();
-  ImGuiIO& io = ImGui::GetIO(); (void)io;
-  ImGui::StyleColorsDark();
-  ImGui_ImplGlfw_InitForOpenGL(window, true);
-  ImGui_ImplOpenGL3_Init("#version 330");
-
-  float bg_color[] {1.f, 0.f, 0.f};
+  ImGuiWrapper imGuiWrapper(window, "#version 330", bg_color, color);
   
   //Shaders
   Shader coreShader("Shaders/vertex.vs", "Shaders/fragment.fs");
@@ -128,21 +119,7 @@ int main()
     glBindVertexArray(triVao);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
-    //Imgui
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-
-    //Create Imgui box
-    ImGui::Begin("My Name is window");
-    ImGui::Text("Hello!");
-    ImGui::ColorPicker3("Colors", bg_color);
-    ImGui::ColorPicker3("TriColor", color);
-    ImGui::End();
-
-    //Draw imgui
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    imGuiWrapper.render(window);
 
     //End gl draw
     glfwSwapBuffers(window);
