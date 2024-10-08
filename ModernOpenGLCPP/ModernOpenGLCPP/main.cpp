@@ -5,8 +5,7 @@
 #include<imgui_impl_opengl3.h>
 //Do not include loader.h
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "Shader.h"
 
 const GLint WIDTH = 800, HEIGHT = 600;
 
@@ -38,24 +37,6 @@ int main()
   };
   GLuint triVbo;
   GLuint triVao;
-
-  //Shader source
-  GLuint vertShader;
-  GLuint fragShader;
-  GLuint shaderProgram;
-  const char* vertShaderSrc = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-  const char* fragShaderSrc = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "uniform vec3 vColor;\n"
-    "void main()\n"
-    "{\n"
-    "    FragColor = vec4(vColor, 1.0f);\n"
-    "}\0";
 
   //Initialise GLFW
   if (!glfwInit())
@@ -112,6 +93,9 @@ int main()
 
   float bg_color[] {1.f, 0.f, 0.f};
   
+  //Shaders
+  Shader coreShader("Shaders/vertex.vs", "Shaders/fragment.fs");
+
   //Init triangle
   glGenVertexArrays(1, &triVao);
   glGenBuffers(1, &triVbo);
@@ -127,50 +111,6 @@ int main()
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 
-  //Init shaders
-  vertShader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertShader, 1, &vertShaderSrc, NULL);
-  glCompileShader(vertShader);
-
-  fragShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragShader, 1, &fragShaderSrc, NULL);
-  glCompileShader(fragShader);
-
-  //Compile status shaders
-  int  success;
-  char infoLog[512];
-  glGetShaderiv(vertShader, GL_COMPILE_STATUS, &success);
-  if (!success)
-  {
-    glGetShaderInfoLog(vertShader, 512, NULL, infoLog);
-    std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-  }
-
-  glGetShaderiv(fragShader, GL_COMPILE_STATUS, &success);
-  if (!success)
-  {
-    glGetShaderInfoLog(fragShader, 512, NULL, infoLog);
-    std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-  }
-
-  //Shader program
-  shaderProgram = glCreateProgram();
-  glAttachShader(shaderProgram, vertShader);
-  glAttachShader(shaderProgram, fragShader);
-  glLinkProgram(shaderProgram);
-
-  //Error check program
-  glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-  if (!success)
-  {
-    glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-    std::cout << "ERROR::SHADER::PROGRAM::LINK_FAILED\n" << infoLog << std::endl;
-  }
-
-  //Cleanup shader
-  glDeleteShader(vertShader);
-  glDeleteShader(fragShader);
-
   //Game loop
   while (!glfwWindowShouldClose(window))
   {
@@ -182,9 +122,9 @@ int main()
     glClear(GL_COLOR_BUFFER_BIT);
 
     //Render stuff
-    glUseProgram(shaderProgram);
+    coreShader.use();
 
-    glUniform3f(glGetUniformLocation(shaderProgram, "vColor"), color[0], color[1], color[2]);
+    coreShader.u3f("vColor", color);
     glBindVertexArray(triVao);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
