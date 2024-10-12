@@ -47,10 +47,13 @@ int main()
   }
 
   //Setup window properties
+  //Good resource: https://www.glfw.org/docs/3.3/window_guide.html#window_full_screen
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); //Use 4.6 for latest
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //No backwards compatability
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); //Allow forward compatability
+  glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+
 
   //Create window
   GLFWwindow* window = glfwCreateWindow(WIDTH,HEIGHT,"Test Window", NULL, NULL);
