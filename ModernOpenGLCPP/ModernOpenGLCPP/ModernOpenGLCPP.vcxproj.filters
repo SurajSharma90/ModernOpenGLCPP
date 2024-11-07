@@ -85,10 +85,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="fragment.fs">
+    <None Include="Shaders\fragment.fs">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="vertex.vs">
+    <None Include="Shaders\vertex.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>

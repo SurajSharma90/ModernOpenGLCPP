@@ -8,6 +8,7 @@
 #include "Shader.h"
 
 const GLint WIDTH = 800, HEIGHT = 600;
+const float TO_RADIANS = 3.14159265f / 180.f;
 
 /*
 * 1. Init GLFW (Check for error)
@@ -30,6 +31,9 @@ int main()
 {
   //Variables
   float color[] = {1.f, 0.f, 1.f};
+  float position[] = {0.f, 0.f, 0.f};
+  float rotation[] = {0.f, 0.f, 0.f};
+  float scale[] = { 1.f, 1.f, 1.f };
   float vertices[] = {
     -0.5f, -0.5f, 0.0f,
     0.5f, -0.5f, 0.0f,
@@ -37,6 +41,8 @@ int main()
   };
   GLuint triVbo;
   GLuint triVao;
+
+  glm::mat4 modelMatrix(1.f);
 
   //Initialise GLFW
   if (!glfwInit())
@@ -120,6 +126,14 @@ int main()
     //Get and handle user input events
     glfwPollEvents();
 
+    //Update triangle position
+    modelMatrix = glm::mat4(1.f);
+    modelMatrix = glm::translate(modelMatrix, glm::vec3(position[0], position[1], position[2]));
+    modelMatrix = glm::rotate(modelMatrix, rotation[0] * TO_RADIANS, glm::vec3(1.f, 0.f, 0.f));
+    modelMatrix = glm::rotate(modelMatrix, rotation[1] * TO_RADIANS, glm::vec3(0.f, 1.f, 0.f));
+    modelMatrix = glm::rotate(modelMatrix, rotation[2] * TO_RADIANS, glm::vec3(0.f, 0.f, 1.f));
+    modelMatrix = glm::scale(modelMatrix, glm::vec3(scale[0], scale[1], scale[2]));
+
     //Clear buffer (color between 0-1 not 255)
     glClearColor(bg_color[0], bg_color[1], bg_color[2], 255.f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -127,7 +141,11 @@ int main()
     //Render stuff
     coreShader.use();
 
+    //Uniforms
     coreShader.u3f("vColor", color);
+    coreShader.mat4f("modelMatrix", modelMatrix);
+
+    //Triangle
     glBindVertexArray(triVao);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -140,7 +158,14 @@ int main()
     ImGui::Begin("My Name is window");
     ImGui::Text("Hello!");
     ImGui::ColorPicker3("Colors", bg_color);
+    ImGui::Spacing();
     ImGui::ColorPicker3("TriColor", color);
+    ImGui::Spacing();
+    ImGui::SliderFloat3("Position", position, -1.f, 1.f);
+    ImGui::Spacing();
+    ImGui::SliderFloat3("Rotation", rotation, 0.f, 360.f);
+    ImGui::Spacing();
+    ImGui::SliderFloat3("Scale", scale, 0.f, 1.f);
     ImGui::End();
 
     //Draw imgui

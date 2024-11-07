@@ -105,3 +105,8 @@ void Shader::u3f(const char* name, float vec[3])
 {
   glUniform3f(glGetUniformLocation(this->ID, name), vec[0], vec[1], vec[2]);
 }
+
+void Shader::mat4f(const char* name, glm::mat4 &matrix)
+{
+  glUniformMatrix4fv(glGetUniformLocation(this->ID, name), 1, GL_FALSE, glm::value_ptr(matrix));
+}
