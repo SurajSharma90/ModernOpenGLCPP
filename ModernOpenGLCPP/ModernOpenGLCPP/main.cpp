@@ -5,7 +5,7 @@
 #include<imgui_impl_opengl3.h>
 //Do not include loader.h
 
-#include "Shader.h"
+#include "Mesh.h";
 
 const GLint WIDTH = 800, HEIGHT = 600;
 const float TO_RADIANS = 3.14159265f / 180.f;
@@ -29,20 +29,12 @@ const float TO_RADIANS = 3.14159265f / 180.f;
 
 int main()
 {
-  //Variables
-  float color[] = {1.f, 0.f, 1.f};
-  float position[] = {0.f, 0.f, 0.f};
-  float rotation[] = {0.f, 0.f, 0.f};
-  float scale[] = { 1.f, 1.f, 1.f };
-  float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-    0.5f, -0.5f, 0.0f,
-    0.0f, 0.5f, 0.0f
+  Vertex vertices[] = {
+    glm::vec3(-0.5f, -0.5f, 0.0f),
+    glm::vec3(0.5f, -0.5f, 0.0f),
+    glm::vec3(0.0f, 0.5f, 0.0f)
   };
-  GLuint triVbo;
-  GLuint triVao;
-
-  glm::mat4 modelMatrix(1.f);
+  int nrOfVertices = sizeof(vertices) / sizeof(Vertex);
 
   //Initialise GLFW
   if (!glfwInit())
@@ -59,7 +51,6 @@ int main()
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //No backwards compatability
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); //Allow forward compatability
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-
 
   //Create window
   GLFWwindow* window = glfwCreateWindow(WIDTH,HEIGHT,"Test Window", NULL, NULL);
@@ -105,20 +96,8 @@ int main()
   //Shaders
   Shader coreShader("Shaders/vertex.vs", "Shaders/fragment.fs");
 
-  //Init triangle
-  glGenVertexArrays(1, &triVao);
-  glGenBuffers(1, &triVbo);
-  glBindVertexArray(triVao);
-
-  glBindBuffer(GL_ARRAY_BUFFER, triVbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-  glEnableVertexAttribArray(0);
-
-  //Unbind
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
+  //Triangle init
+  Mesh mesh(vertices, nrOfVertices);
 
   //Game loop
   while (!glfwWindowShouldClose(window))
@@ -126,28 +105,13 @@ int main()
     //Get and handle user input events
     glfwPollEvents();
 
-    //Update triangle position
-    modelMatrix = glm::mat4(1.f);
-    modelMatrix = glm::translate(modelMatrix, glm::vec3(position[0], position[1], position[2]));
-    modelMatrix = glm::rotate(modelMatrix, rotation[0] * TO_RADIANS, glm::vec3(1.f, 0.f, 0.f));
-    modelMatrix = glm::rotate(modelMatrix, rotation[1] * TO_RADIANS, glm::vec3(0.f, 1.f, 0.f));
-    modelMatrix = glm::rotate(modelMatrix, rotation[2] * TO_RADIANS, glm::vec3(0.f, 0.f, 1.f));
-    modelMatrix = glm::scale(modelMatrix, glm::vec3(scale[0], scale[1], scale[2]));
+    mesh.update();
 
     //Clear buffer (color between 0-1 not 255)
     glClearColor(bg_color[0], bg_color[1], bg_color[2], 255.f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    //Render stuff
-    coreShader.use();
-
-    //Uniforms
-    coreShader.u3f("vColor", color);
-    coreShader.mat4f("modelMatrix", modelMatrix);
-
-    //Triangle
-    glBindVertexArray(triVao);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    mesh.render(coreShader);
 
     //Imgui
     ImGui_ImplOpenGL3_NewFrame();
@@ -159,13 +123,13 @@ int main()
     ImGui::Text("Hello!");
     ImGui::ColorPicker3("Colors", bg_color);
     ImGui::Spacing();
-    ImGui::ColorPicker3("TriColor", color);
+    ImGui::ColorPicker3("TriColor", mesh.getColor());
     ImGui::Spacing();
-    ImGui::SliderFloat3("Position", position, -1.f, 1.f);
+    ImGui::SliderFloat3("Position", mesh.getPosition(), -1.f, 1.f);
     ImGui::Spacing();
-    ImGui::SliderFloat3("Rotation", rotation, 0.f, 360.f);
+    ImGui::SliderFloat3("Rotation", mesh.getRotation(), 0.f, 360.f);
     ImGui::Spacing();
-    ImGui::SliderFloat3("Scale", scale, 0.f, 1.f);
+    ImGui::SliderFloat3("Scale", mesh.getScale(), 0.f, 1.f);
     ImGui::End();
 
     //Draw imgui
