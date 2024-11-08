@@ -15,6 +15,7 @@ private:
   glm::mat4 modelMatrix;
 
   glm::vec3 color;
+  bool useVertexColor;
 
   glm::vec3 position;
   glm::vec3 rotation;
@@ -31,5 +32,6 @@ public:
   inline float* getPosition() { return glm::value_ptr(this->position); }
   inline float* getRotation() { return glm::value_ptr(this->rotation); }
   inline float* getScale() { return glm::value_ptr(this->scale); }
+  inline bool& getUseVertexColor() { return this->useVertexColor; }
 };
 

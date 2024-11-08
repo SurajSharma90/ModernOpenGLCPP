@@ -10,6 +10,8 @@ Mesh::Mesh(Vertex* vertices, int nrOfVertices)
     this->vertices[i] = vertices[i];
   }
 
+  this->useVertexColor = true;
+
   this->color = glm::vec3(1.f, 1.f, 1.f);
   this->position = glm::vec3(0.f);
   this->rotation = glm::vec3(0.f);
@@ -25,6 +27,9 @@ Mesh::Mesh(Vertex* vertices, int nrOfVertices)
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
   glEnableVertexAttribArray(0);
+
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
+  glEnableVertexAttribArray(1);
 
   //Unbind
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -53,6 +58,7 @@ void Mesh::render(Shader& shader)
 
   shader.u3f("vColor", glm::value_ptr(this->color));
   shader.mat4f("modelMatrix", this->modelMatrix);
+  shader.u1i("useVertexColor", (int)this->useVertexColor);
 
   glBindVertexArray(this->VAO);
   glDrawArrays(GL_TRIANGLES, 0, 3);

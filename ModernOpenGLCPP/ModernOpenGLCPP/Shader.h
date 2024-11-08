@@ -28,5 +28,6 @@ public:
   void u3f(const char* name, const float x, const float y, const float z);
   void u3f(const char* name, float vec[3]);
   void mat4f(const char* name, glm::mat4 &matrix);
+  void u1i(const char* name, int value);
 };
 

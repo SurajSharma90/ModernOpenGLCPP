@@ -29,9 +29,9 @@ const GLint WIDTH = 800, HEIGHT = 600;
 int main()
 {
   Vertex vertices[] = {
-    glm::vec3(-0.5f, -0.5f, 0.0f),
-    glm::vec3(0.5f, -0.5f, 0.0f),
-    glm::vec3(0.0f, 0.5f, 0.0f)
+    glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(1.f, 0.f, 0.f),
+    glm::vec3(0.5f, -0.5f, 0.0f), glm::vec3(0.f, 1.f, 0.f),
+    glm::vec3(0.0f, 0.5f, 0.0f), glm::vec3(0.f, 0.f, 1.f)
   };
   int nrOfVertices = sizeof(vertices) / sizeof(Vertex);
 
@@ -90,7 +90,7 @@ int main()
   ImGui_ImplGlfw_InitForOpenGL(window, true);
   ImGui_ImplOpenGL3_Init("#version 330");
 
-  float bg_color[] {1.f, 0.f, 0.f};
+  float bg_color[] {0.f, 0.f, 0.f};
   
   //Shaders
   Shader coreShader("Shaders/vertex.vs", "Shaders/fragment.fs");
@@ -129,6 +129,8 @@ int main()
     ImGui::SliderFloat3("Rotation", mesh.getRotation(), 0.f, 360.f);
     ImGui::Spacing();
     ImGui::SliderFloat3("Scale", mesh.getScale(), 0.f, 1.f);
+    ImGui::Spacing();
+    ImGui::Checkbox("Vertex Color", &mesh.getUseVertexColor());
     ImGui::End();
 
     //Draw imgui
