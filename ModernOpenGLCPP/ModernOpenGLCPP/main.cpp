@@ -8,7 +8,6 @@
 #include "Mesh.h";
 
 const GLint WIDTH = 800, HEIGHT = 600;
-const float TO_RADIANS = 3.14159265f / 180.f;
 
 /*
 * 1. Init GLFW (Check for error)

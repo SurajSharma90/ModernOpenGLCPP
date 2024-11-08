@@ -41,9 +41,9 @@ void Mesh::update()
   //Update triangle position
   this->modelMatrix = glm::mat4(1.f);
   this->modelMatrix = glm::translate(this->modelMatrix, this->position);
-  this->modelMatrix = glm::rotate(this->modelMatrix, this->rotation.x * (float)M_PI / 180.f, glm::vec3(1.f, 0.f, 0.f));
-  this->modelMatrix = glm::rotate(this->modelMatrix, this->rotation.y * (float)M_PI / 180.f, glm::vec3(0.f, 1.f, 0.f));
-  this->modelMatrix = glm::rotate(this->modelMatrix, this->rotation.z * (float)M_PI / 180.f, glm::vec3(0.f, 0.f, 1.f));
+  this->modelMatrix = glm::rotate(this->modelMatrix, glm::radians(this->rotation.x), glm::vec3(1.f, 0.f, 0.f));
+  this->modelMatrix = glm::rotate(this->modelMatrix, glm::radians(this->rotation.y), glm::vec3(0.f, 1.f, 0.f));
+  this->modelMatrix = glm::rotate(this->modelMatrix, glm::radians(this->rotation.z), glm::vec3(0.f, 0.f, 1.f));
   this->modelMatrix = glm::scale(this->modelMatrix, this->scale);
 }
 
