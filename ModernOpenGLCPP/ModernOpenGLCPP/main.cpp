@@ -35,6 +35,46 @@ int main()
   };
   int nrOfVertices = sizeof(vertices) / sizeof(Vertex);
 
+  Vertex verticesCube[] = {
+    glm::vec3(-1.0f,-1.0f,-1.0f), glm::vec3(1.f, 0.f, 0.f),
+    glm::vec3(-1.0f,-1.0f, 1.0f), glm::vec3(1.f, 1.f, 0.f),
+    glm::vec3(-1.0f, 1.0f, 1.0f), glm::vec3(1.f, 0.f, 0.f),
+    glm::vec3(1.0f, 1.0f,-1.0f), glm::vec3(1.f, 0.f, 1.f),
+    glm::vec3(-1.0f,-1.0f,-1.0f), glm::vec3(1.f, 0.f, 0.f),
+    glm::vec3(-1.0f, 1.0f,-1.0f), glm::vec3(1.f, 1.f, 0.f),
+    glm::vec3(1.0f,-1.0f, 1.0f), glm::vec3(1.f, 0.f, 0.f),
+    glm::vec3(-1.0f,-1.0f,-1.0f), glm::vec3(1.f, 0.f, 1.f),
+    glm::vec3(1.0f,-1.0f,-1.0f), glm::vec3(1.f, 0.f, 0.f),
+    glm::vec3(1.0f, 1.0f,-1.0f), glm::vec3(1.f, 1.f, 0.f),
+    glm::vec3(1.0f,-1.0f,-1.0f), glm::vec3(1.f, 0.f, 0.f),
+    glm::vec3(-1.0f,-1.0f,-1.0f), glm::vec3(1.f, 0.f, 1.f),
+    glm::vec3(-1.0f,-1.0f,-1.0f), glm::vec3(1.f, 0.f, 0.f),
+    glm::vec3(-1.0f, 1.0f, 1.0f), glm::vec3(1.f, 1.f, 0.f),
+    glm::vec3(-1.0f, 1.0f,-1.0f), glm::vec3(1.f, 0.f, 0.f),
+    glm::vec3(1.0f,-1.0f, 1.0f), glm::vec3(1.f, 0.f, 1.f),
+    glm::vec3(-1.0f,-1.0f, 1.0f), glm::vec3(1.f, 0.f, 0.f),
+    glm::vec3(-1.0f,-1.0f,-1.0f), glm::vec3(1.f, 0.f, 0.f),
+    glm::vec3(-1.0f, 1.0f, 1.0f), glm::vec3(1.f, 1.f, 0.f),
+    glm::vec3(-1.0f,-1.0f, 1.0f), glm::vec3(1.f, 0.f, 0.f),
+    glm::vec3(1.0f,-1.0f, 1.0f), glm::vec3(1.f, 0.f, 0.f),
+    glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.f, 0.f, 1.f),
+    glm::vec3(1.0f,-1.0f,-1.0f), glm::vec3(1.f, 0.f, 0.f),
+    glm::vec3(1.0f, 1.0f,-1.0f), glm::vec3(1.f, 1.f, 0.f),
+    glm::vec3(1.0f,-1.0f,-1.0f), glm::vec3(1.f, 0.f, 0.f),
+    glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.f, 0.f, 1.f),
+    glm::vec3(1.0f,-1.0f, 1.0f), glm::vec3(1.f, 0.f, 0.f),
+    glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.f, 1.f, 0.f),
+    glm::vec3(1.0f, 1.0f,-1.0f), glm::vec3(1.f, 0.f, 0.f),
+    glm::vec3(-1.0f, 1.0f,-1.0f), glm::vec3(1.f, 0.f, 0.f),
+    glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.f, 0.f, 0.f),
+    glm::vec3(-1.0f, 1.0f,-1.0f), glm::vec3(1.f, 0.f, 1.f),
+    glm::vec3(-1.0f, 1.0f, 1.0f), glm::vec3(1.f, 0.f, 0.f),
+    glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.f, 1.f, 0.f),
+    glm::vec3(-1.0f, 1.0f, 1.0f), glm::vec3(1.f, 0.f, 0.f),
+    glm::vec3(1.0f,-1.0f, 1.0f), glm::vec3(1.f, 1.f, 0.f)
+  };
+  int nrOfVerticesCube = sizeof(verticesCube) / sizeof(Vertex);
+  
   //Initialise GLFW
   if (!glfwInit())
   {
@@ -82,6 +122,9 @@ int main()
   //Setup viewport (size of the part we are drawing to in the window)
   glViewport(0, 0, bufferWidth, bufferHeight);
 
+  //Init GL
+  glEnable(GL_DEPTH_TEST);
+
   //Init IMGUI
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -95,8 +138,11 @@ int main()
   //Shaders
   Shader coreShader("Shaders/vertex.vs", "Shaders/fragment.fs");
 
+  //Projection Matrix
+  glm::mat4 projectionMatrix = glm::perspective(45.f, (GLfloat)bufferWidth/(GLfloat)bufferHeight, 0.1f, 100.f);
+
   //Triangle init
-  Mesh mesh(vertices, nrOfVertices);
+  Mesh mesh(verticesCube, nrOfVerticesCube);
 
   //Game loop
   while (!glfwWindowShouldClose(window))
@@ -108,9 +154,9 @@ int main()
 
     //Clear buffer (color between 0-1 not 255)
     glClearColor(bg_color[0], bg_color[1], bg_color[2], 255.f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    mesh.render(coreShader);
+    mesh.render(coreShader, projectionMatrix);
 
     //Imgui
     ImGui_ImplOpenGL3_NewFrame();
@@ -124,11 +170,11 @@ int main()
     ImGui::Spacing();
     ImGui::ColorPicker3("TriColor", mesh.getColor());
     ImGui::Spacing();
-    ImGui::SliderFloat3("Position", mesh.getPosition(), -1.f, 1.f);
+    ImGui::InputFloat3("Position", mesh.getPosition());
     ImGui::Spacing();
     ImGui::SliderFloat3("Rotation", mesh.getRotation(), 0.f, 360.f);
     ImGui::Spacing();
-    ImGui::SliderFloat3("Scale", mesh.getScale(), 0.f, 1.f);
+    ImGui::InputFloat3("Scale", mesh.getScale());
     ImGui::Spacing();
     ImGui::Checkbox("Vertex Color", &mesh.getUseVertexColor());
     ImGui::End();

@@ -13,6 +13,7 @@ private:
   GLuint VBO;
 
   glm::mat4 modelMatrix;
+  glm::mat4 projectionMatrix;
 
   glm::vec3 color;
   bool useVertexColor;
@@ -26,7 +27,7 @@ public:
   ~Mesh();
 
   void update();
-  void render(Shader& shader);
+  void render(Shader& shader, glm::mat4& projectionMatrix);
 
   inline float* getColor() { return glm::value_ptr(this->color); }
   inline float* getPosition() { return glm::value_ptr(this->position); }

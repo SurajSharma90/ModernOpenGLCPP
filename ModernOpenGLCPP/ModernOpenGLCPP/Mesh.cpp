@@ -52,14 +52,15 @@ void Mesh::update()
   this->modelMatrix = glm::scale(this->modelMatrix, this->scale);
 }
 
-void Mesh::render(Shader& shader)
+void Mesh::render(Shader& shader, glm::mat4& projectionMatrix)
 {
   shader.use();
 
   shader.u3f("vColor", glm::value_ptr(this->color));
   shader.mat4f("modelMatrix", this->modelMatrix);
+  shader.mat4f("projectionMatrix", projectionMatrix);
   shader.u1i("useVertexColor", (int)this->useVertexColor);
 
   glBindVertexArray(this->VAO);
-  glDrawArrays(GL_TRIANGLES, 0, 3);
+  glDrawArrays(GL_TRIANGLES, 0, this->nrOfVertices);
 }
